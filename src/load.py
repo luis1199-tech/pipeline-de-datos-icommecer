@@ -8,11 +8,11 @@ def load(data_frames: Dict[str, DataFrame], database: Engine):
     """Load the dataframes into the sqlite database.
 
     Args:
-        data_frames (Dict[str, DataFrame]): A dictionary with keys as the table names
-        and values as the dataframes.
+        data_frames (Dict[str, DataFrame]): Un diccionario con claves como los nombres de las tablas
+        y valores como los dataframes a cargar.
     """
-    # TODO: Implementa esta función. Por cada DataFrame en el diccionario, debes
-    # usar pandas.DataFrame.to_sql() para cargar el DataFrame en la base de datos
-    # como una tabla.
-    # Para el nombre de la tabla, utiliza las claves del diccionario `data_frames`.
+    for table_name, df in data_frames.items():
+        # Cargar cada DataFrame en la base de datos SQLite.
+        # Se usa if_exists="replace" para sobrescribir la tabla si ya existe.
+        df.to_sql(name=table_name, con=database, index=False, if_exists="replace")
     raise NotImplementedError

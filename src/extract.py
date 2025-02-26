@@ -10,25 +10,43 @@ def temp() -> DataFrame:
     """
     return read_csv("data/temperature.csv")
 
+# funcion para la extraccion
+
 def get_public_holidays(public_holidays_url: str, year: str) -> DataFrame:
     """Get the public holidays for the given year for Brazil.
     Args:
-        public_holidays_url (str): url to the public holidays.
-        year (str): The year to get the public holidays for.
+        public_holidays_url (str): URL base para obtener los días festivos.
+        year (str): El año para obtener los días festivos.
     Raises:
-        SystemExit: If the request fails.
+        SystemExit: Si la solicitud HTTP falla.
     Returns:
-        DataFrame: A dataframe with the public holidays.
+        DataFrame: Un dataframe con los días festivos públicos.
     """
-    # TODO: Implementa esta función.
-    # Debes usar la biblioteca requests para obtener los días festivos públicos del año dado.
-    # La URL es public_holidays_url/{year}/BR.
-    # Debes eliminar las columnas "types" y "counties" del DataFrame.
-    # Debes convertir la columna "date" a datetime.
-    # Debes lanzar SystemExit si la solicitud falla. Investiga el método raise_for_status
-    # de la biblioteca requests.
+    # Construir la URL: public_holidays_url/{year}/BR
+    url = f"{public_holidays_url}/{year}/BR"
+    
+    # Realizar la solicitud GET
+    response = requests.get(url)
+    
+    # Si la solicitud falla, raise_for_status() lanzará una excepción HTTPError;
+    # capturamos la excepción y lanzamos SystemExit.
+    try:
+        response.raise_for_status()
+    except requests.HTTPError as e:
+        raise SystemExit(e)
+    
+    # Convertir la respuesta JSON en un DataFrame
+    data = response.json()
+    df = DataFrame(data)
+    
+    # Eliminar las columnas "types" y "counties" si existen
+    df.drop(columns=["types", "counties"], inplace=True, errors="ignore")
+    
+    # Convertir la columna "date" a formato datetime
+    df["date"] = to_datetime(df["date"])
+    
+    return df
 
-    raise NotImplementedError
 
 
 def extract(
